@@ -323,14 +323,15 @@ define(['handlebars'],function(Handlebars){
      * @return {Boolean}
      */
     App.prototype.navigate = function(hash){
+        hash = hash.replace('#','');
         var location = window.location;
         var root = location.pathname.replace(/[^\/]$/, '$&');
         var self = this;
-        if(history.pushState){
-            history.pushState(null, document.title, root+location.search + '#!/' + hash);
-        } else {
-            location.replace(root + location.search + '#!/' + hash);
-        }
+        var url = root + location.search + '#!/' + hash;
+
+        if(history.pushState) history.pushState(null, document.title, url);
+        else location.replace(url);
+        
 
         return true;
     };
@@ -346,7 +347,7 @@ define(['handlebars'],function(Handlebars){
     App.prototype.delegateEvent = function(events, scope){
         var method;
         var match;
-        var event_name;
+        var type;
         var selector;
         var nodes;
         var self = this;
@@ -358,8 +359,8 @@ define(['handlebars'],function(Handlebars){
         for(var key in events){
             if(events.hasOwnProperty(key)){
                 method = events[key];
-                match = key.match(delegateEventSplitter);
-                event_name = match[1];
+                match  = key.match(delegateEventSplitter);
+                type = match[1];
                 selector = match[2];
 
                 /*
@@ -367,10 +368,10 @@ define(['handlebars'],function(Handlebars){
                  * the caller function has access to event,
                  * App, and scope
                  */
-                nodes = document.querySelectorAll('#'+scope.mid+' ' + selector);
+                nodes = document.querySelectorAll('#' + scope.mid + ' ' + selector);
 
-                for(var i=0, max=nodes.length; i<max;i++){
-                    self.bindEvent(nodes[i],event_name, scope[method].bind(scope), true);
+                for(var i=0, t=nodes.length; i<t;i++){
+                    self.bindEvent(nodes[i],type, scope[method].bind(scope), true);
                 }
             }
         }
@@ -389,17 +390,17 @@ define(['handlebars'],function(Handlebars){
     App.prototype.bindEvent = function(el, e, fn, pdef){
         //this might not be ok
         pdef = pdef || false;
-        if(el.addEventListener){
-            el.addEventListener(e, function(event){
-                if(pdef){event.preventDefault? event.preventDefault() : event.returnValue = false; }
-                fn(event);
-            }, false);
-        } else {
-            el.attachEvent('on'+e, function(event){
-                if(pdef){event.preventDefault? event.preventDefault() : event.returnValue = false; }
-                fn(event);
-            });
-        }
+
+        var handleBinding = function(event){
+            if(pdef){
+                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+            }
+            fn(event);
+        };
+
+        if(el.addEventListener) el.addEventListener(e, handleBinding, false);
+        else el.attachEvent('on'+e, handleBinding);
+        
     };
 
     App.prototype.ajax = function(){
