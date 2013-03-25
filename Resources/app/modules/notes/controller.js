@@ -5,9 +5,9 @@ define(function(){
 	NotesController.prototype.routes = {
 		'*' : 'render',
 		'note/list' : 'list',
-		'note/edit':'edit',
-		'note/delete':'delete',
-		'note/create':'create'
+		'note/edit' : 'edit',
+		'note/delete' : 'delete',
+		'note/create' : 'create'
 	};
 
 	NotesController.prototype.list = function(){
