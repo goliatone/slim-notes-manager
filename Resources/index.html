@@ -12,76 +12,14 @@
     <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-    <script id="note-template" type="text/x-handlebars-template">
-        {{#notes}}
-        <div id="note-{{id}}" class="note-holder row-fluid">
-            <div class="span note-entry">
-                <div class="btn-group actions" data-parent-id="{{id}}">
-                    <button type="button" class="btn"><i class="icon-eye-open"></i></button>
-                    <button type="button" class="btn"><i class="icon-edit"></i></button>
-                    <button type="button" class="btn"><i class="icon-trash"></i></button>
-                </div>
-                <h3>{{title}}</h3>
-                <div>{{date}}</div>
-                <p>{{content}}</p>
-            </div>
-        </div>
-        {{/notes}}
-    </script>
     <!-- Part 1: Wrap all page content here -->
     <div id="wrap">
         <!-- Fixed navbar -->
-        <div class="navbar ">
-            <div class="navbar-inner">
-                <div class="container">
-                    <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
-                    <a class="brand" href="#">Yotomanager</a>
-                    <div class="nav-collapse collapse">
-                        <ul class="nav">
-                            <li class="active"><a href="#">Dashboard</a></li>
-                            <li><a href="#about">Settings</a></li>
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Notes <b class="caret"></b></a>
-                                <ul class="dropdown-menu">
-                                    <li><a href="#">List</a></li>
-                                    <li><a href="#">Create</a></li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </div><!--/.nav-collapse -->
-                </div>
-            </div>
-        </div>
-      <!-- Begin page content -->
-      <div class="container-fluid">
-            <div class="row-fluid section-heading">
-                <h2>Notes</h2>
-                <a href="note-create.html" class="btn btn-success right" type="button">
-                    <i class="icon-plus icon-white"></i>    Create Note
-                </a>    
-            </div>
-        <div class="row-fluid">
-            <div id="notes-holder" class="span">
-                Loading...
-            </div>
-            <div class="push"></div>
-            <div class="pagination">
-                <ul>
-                    <li><a href="#">&laquo;</a></li>
-                    <li><a href="#">1</a></li>
-                    <li><a href="#">2</a></li>
-                    <li><a href="#">3</a></li>
-                    <li><a href="#">4</a></li>
-                    <li><a href="#">5</a></li>
-                    <li><a href="#">&raquo;</a></li>
-                </ul>
-            </div><!--/span-->
-            
-        </div><!--/row-->
+        <div id="navigation"></div>
+        <!-- Begin page content -->
+        <div class="container-fluid">
+            <div id="header"></div>
+            <div id="controller"></div>
         </div>
     </div>
     <!-- <div id="push"></div>

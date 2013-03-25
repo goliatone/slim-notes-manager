@@ -3,27 +3,7 @@ define(function(){
 	var NotesController = function(){};
 
 	NotesController.prototype.routes = {
-		'*' : 'render',
-		'note/list' : 'list',
-		'note/edit':'edit',
-		'note/delete':'delete',
-		'note/create':'create'
-	};
-
-	NotesController.prototype.list = function(){
-
-	};
-
-	NotesController.prototype.edit = function(){
-
-	};
-
-	NotesController.prototype.create = function(){
-		this.render();
-	};
-
-	NotesController.prototype.delete = function(){
-
+		'note/create' : 'render'
 	};
 
 	NotesController.prototype.render = function(){

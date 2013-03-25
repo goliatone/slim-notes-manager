@@ -43,6 +43,6 @@ Thumbs.db
 *.sublime-workspace
 *.tmproj
 
-#Yii FILES
+#FILES AND DIRS.
 #######################
-
+dist/*
