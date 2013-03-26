@@ -104,6 +104,7 @@ define(['handlebars'],function(Handlebars){
 
         this.loadUrl(hash);
 
+        //TODO: Delegate, proxy.
         window.onhashchange = function(){
             self.loadUrl(window.location.hash);
         };
@@ -265,9 +266,11 @@ define(['handlebars'],function(Handlebars){
      */
     App.prototype.render = function(scope, data){
         var template = scope.template;
-        var el = document.getElementById(scope.mid);
-        //TODO: WHAT DO WE DO WHEN el IS NULL?
 
+        //TODO: WHAT DO WE DO WHEN el IS NULL?
+        var el = document.getElementById(scope.mid);
+
+        //TODO: We should be caching all this cruft.
         //TODO: Inject renderer, its just a method
         //that should take template and data and return
         //a HTML string.
