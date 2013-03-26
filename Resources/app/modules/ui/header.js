@@ -2,11 +2,13 @@
 define(function(){
 	var Header = function(){};
 
+	Header.prototype.templates = {};
+	
 	Header.prototype.routes = {
-		'*' : 'renderHeader'
+		'*' : 'render'
 	};
 
-	Header.prototype.renderHeader = function(){
+	Header.prototype.render = function(){
 		App.render(this);
 	};
 

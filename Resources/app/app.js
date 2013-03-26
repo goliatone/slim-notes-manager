@@ -106,6 +106,7 @@ define(['handlebars'],function(Handlebars){
 
         //TODO: Delegate, proxy.
         window.onhashchange = function(){
+            console.log('onhashchange ', window.location.hash);
             self.loadUrl(window.location.hash);
         };
     };
@@ -179,14 +180,56 @@ define(['handlebars'],function(Handlebars){
 
         scope.loaded = true;
 
-        if(!scope.hasOwnProperty('template')){
-            var o = {};
+        //we are assuming that each controller has a template. wrong?
+        //we should declare our templates in the module.
+        //one module/controller can have more than one template,
+        //one template per action/route.
+        if('templates' in scope){
+            
+            //instances template cache.
+            // scope.templates = {};
+            // scope.templates.__loaded__ = {};
+
+            //ITERATE OVER ALL TEMPLATES, IF NONE, JUST
+            //ASSUME THAT WE WANT TO LOAD A TEMPLATE WITH MID.
+            var templates = scope.templates;
+
+            if(this.isEmptyObject(templates) && !('skipTemplates' in scope)){
+                templates[scope.mid] = '';
+            }
+
+            var current = 0;
+            var total   = this.objectLength(templates);
+            $.each(templates, function(templateId, templateValue) {
+                console.log('****** Loading stuff for ', templateId, templateValue);
+                self.ajax({
+                    url:self.templateUrl(templateId),
+                    type:'GET',
+                    success:function(data){
+                        // templates[template] = data;
+                        scope.templates[templateId] = data;
+                        console.log('===== Loaded template ',templateId);
+                        if(++current === total ){
+                            console.log('Loaded all templates for ', module);
+                            self.loadDependencies(scope, function(){
+                                scope[route_fn](queryData);
+                            });
+                        }
+                    },
+                    error:function(){
+                        console.log('Error loading template '+templateId+'.tpl');
+                    }
+                });
+            });
+            
+            
+            /*var o = {};
             //TODO: make build url method.
-            o.url = 'app/templates/'+scope.mid+'.tpl';
+            o.url = self.templateUrl(scope.mid);
             o.type = 'GET';
             //TODO: proxy, fire event.
             o.success = function(data){
-                scope.template = data;
+                scope.templates[scope.mid] = data;
                 //TODO: DRY.
                 self.loadDependencies(scope, function(){
                     scope[route_fn](queryData);
@@ -196,12 +239,16 @@ define(['handlebars'],function(Handlebars){
                 console.log('Error Loading '+scope.mid+'.tpl');
             };
             
-            this.ajax(o);
+            this.ajax(o);*/
         } else {
             self.loadDependencies(scope, function(){
                 scope[route_fn](queryData);
             });
         }
+    };
+
+    App.prototype.templateUrl = function(templateId, ext){
+        return 'app/templates/'+ templateId +'.tpl';
     };
 
     App.prototype.loadTemplate = function(scope, callback){
@@ -264,8 +311,12 @@ define(['handlebars'],function(Handlebars){
      * @param {Object} scope The module object to be used.
      * @param {Object} [data] Any data to be rendered onto the template.
      */
-    App.prototype.render = function(scope, data){
-        var template = scope.template;
+    App.prototype.render = function(scope, data, templateId){
+        templateId = templateId || scope.mid;
+
+        var template = scope.templates[templateId];
+        // console.log('Template is: ', template);
+        // console.log('scope: ', scope);
 
         //TODO: WHAT DO WE DO WHEN el IS NULL?
         var el = document.getElementById(scope.mid);
@@ -332,6 +383,7 @@ define(['handlebars'],function(Handlebars){
      * @return {Boolean}
      */
     App.prototype.navigate = function(hash){
+        console.log('Navigate hash ', hash);
         hash = hash.replace('#','');
 
         var self = this;
@@ -339,8 +391,10 @@ define(['handlebars'],function(Handlebars){
         var root = location.pathname.replace(/[^\/]$/, '$&');
         var url = root + location.search + '#!/' + hash;
 
-        if(history.pushState) history.pushState(null, document.title, url);
-        else location.replace(url);
+        if(history.pushState) {
+            history.pushState(null, document.title, url);
+            self.loadUrl(hash);
+        } else location.replace(url);
         
 
         return true;
@@ -420,6 +474,25 @@ define(['handlebars'],function(Handlebars){
 
         jQuery.ajax.apply(jQuery, arguments);
     };
+
+    //TODO: Move to helper?
+    App.prototype.isEmptyObject = function( obj ) {
+        var name;
+        for ( name in obj ) {
+            return false;
+        }
+        return true;
+    };
+
+    App.prototype.objectLength = function(obj){
+        var prop, count = 0;
+
+        for (prop in obj) {
+            if (obj.hasOwnProperty(prop)) count++;
+            
+        }
+        return count;
+    }
 
     return App;
 });

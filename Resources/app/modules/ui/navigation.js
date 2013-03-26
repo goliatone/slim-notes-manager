@@ -2,15 +2,17 @@
 define(function(){
 	var Navigation = function(){};
 
+	Navigation.prototype.templates = {};
+
 	Navigation.prototype.events = {
 		'click a:not([data-ignore])' : 'gotoPage'
 	};
 
 	Navigation.prototype.routes = {
-		'*' : 'renderNavigation'
+		'*' : 'render'
 	};
 
-	Navigation.prototype.renderNavigation = function(){
+	Navigation.prototype.render = function(){
 		App.render(this);
 	};
 
