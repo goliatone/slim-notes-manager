@@ -58,13 +58,14 @@ define(['handlebars'],function(Handlebars){
                 //module is actually its id.
                 moduleId = self.modules[i].split('/').pop();
 
-                //TODO: Do we want to work with objects or classes?
-                //how do we know if its an instance or a 'class'?!
+                //TODO: Do we want to work with objects or constructors?
+                //typeof module === 'function' => constructor, we have to create it.
+                //typeof module === 'object' => instance.
                 module = arguments[i];
                 self.scope[moduleId] = module;
 
                 module.mid = moduleId;
-                module.el = document.getElementById(moduleId);
+                module.el  = document.getElementById(moduleId);
 
                 if(typeof jQuery !== 'undefined')
                     module.$el = jQuery('#'+moduleId);
@@ -84,15 +85,19 @@ define(['handlebars'],function(Handlebars){
         var self = this;
         var hash = window.location.hash;
         var module;
+        var route;
         for(var moduleId in this.scope){
             if(!this.scope.hasOwnProperty(moduleId)) continue;
             module = this.scope[moduleId];
-            for(var route in module.routes ){
+            for(var routeId in module.routes ){
+                route = {id:moduleId, handler:module.routes[routeId]};
                 //hide to method, just add the route and module.
-                if(this.routes.hasOwnProperty(route)){
-                    this.routes[route].push([moduleId, module.routes[route]]);
+                if(this.routes.hasOwnProperty(routeId)){
+                    // this.routes[route].push([moduleId, module.routes[route]]);
+                    this.routes[routeId].push(route);
                 } else {
-                    this.routes[route] = [[moduleId, module.routes[route]]];
+                    // this.routes[route] = [[moduleId, module.routes[route]]];
+                    this.routes[routeId] = [route];
                 }
             }
         }
@@ -116,10 +121,10 @@ define(['handlebars'],function(Handlebars){
      */
     App.prototype.loadUrl = function(hash){
         console.log('loading hash ', hash);
-        var el_lock;
+        var lastModuleId;
         var moduleId;
         var queryData = {};
-        var i, t;
+        var i, t, route;
         hash = hash.replace('#!/','');
 
         //query string
@@ -138,16 +143,17 @@ define(['handlebars'],function(Handlebars){
 
         this.queryData = queryData;
 
-        for(var route in this.routes){
-            if(!this.routes.hasOwnProperty(route)) continue;
-
-            for(i = 0, t = this.routes[route].length;i < t; i++){
-                moduleId = this.routes[route][i][0];
-                console.log('moduel name ',moduleId, el_lock);
-                if(hash[0] === route || route === '*'){
-                    if(el_lock === moduleId) continue;
-                    el_lock =  moduleId;
-                    this.processor(moduleId, this.routes[route][i][1], queryData);
+        for(var routeId in this.routes){
+            if(!this.routes.hasOwnProperty(routeId)) continue;
+            for(i = 0, t = this.routes[routeId].length;i < t; i++){
+                route = this.routes[routeId][i];
+                moduleId = route.id;
+                console.log('moduel name ',moduleId, lastModuleId);
+                if(this.activeRoute === routeId || routeId === '*'){
+                    //TODO: Include in first if.
+                    if(lastModuleId === moduleId) continue;
+                    lastModuleId =  moduleId;
+                    this.processor(moduleId, route.handler, queryData);
                 } else {
                     this.unrender(moduleId);
                 }
@@ -167,7 +173,7 @@ define(['handlebars'],function(Handlebars){
     App.prototype.processor = function(module, route_fn, queryData){
         console.log('processor ', module, route_fn, queryData);
 
-        var self = this;
+        var self  = this;
         var scope = this.scope[module];
 
         scope.loaded = true;
@@ -211,38 +217,38 @@ define(['handlebars'],function(Handlebars){
      */
     App.prototype.loadDependencies = function(scope, callback){
         var self = this;
-        var dep_name;
-        var dep_src;
-        var arr_dep_name = [];
-        var arr_dep_src = [];
+        var name, src;
+        var names = [];
+        var srcs = [];
 
         if(scope.hasOwnProperty('dependencies')){
             for(var dep in scope.dependencies){
                 if(scope.depencencies.hasOwnProperty(dep)){
-                    dep_name = dep;
-                    dep_src = scope.dependencies[dep];
+                    name = dep;
+                    src = scope.dependencies[dep];
 
-                    if(self.dependencies.hasOwnProperty(dep_src)){
-                        scope[dep_name] = self.dependencies[dep_src];
+                    if(self.dependencies.hasOwnProperty(src)){
+                        scope[name] = self.dependencies[src];
                     } else {
-                        arr_dep_name.push(dep_name);
-                        arr_dep_src.push(dep_src);
+                        srcs.push(src);
+                        names.push(name);
                     }
                 }
             }
-            require(arr_dep_src, function(){
-                for(var i=0,max=arguments.length;i<max;i++){
-                    scope[arr_dep_name[i]] = arguments[i];
 
-                    self.dependencies[arr_dep_src[i]] = arguments[i];
+            require(srcs, function(){
+                for(var i=0,t=arguments.length; i<t; i++){
+                    scope[names[i]] = arguments[i];
+
+                    self.dependencies[srcs[i]] = arguments[i];
                 }
-                //TODO: DRY
+                //TODO: DRY, trigger event!
                 if(callback && typeof callback === 'function')
                     callback(scope);
             });
         } else {
             //module no dependent
-            //TODO: DRY
+            //TODO: DRY, trigger event!
             if(callback && typeof callback === 'function')
                     callback(scope);
         }
@@ -301,13 +307,13 @@ define(['handlebars'],function(Handlebars){
         if(!scope.hasOwnProperty('loaded')){
             self.loadDependencies(scope, function(scope){
                 scope.loaded = true;
-                //TODO: DRY
+                //TODO: DRY, trigger event!
                 if(callback && typeof callback === 'function'){
                     callback(scope);
                 }
             });
         } else {
-            //TODO: DRY
+            //TODO: DRY, trigger event!
             if(callback && typeof callback === 'function'){
                 callback(scope);
             }
@@ -324,9 +330,10 @@ define(['handlebars'],function(Handlebars){
      */
     App.prototype.navigate = function(hash){
         hash = hash.replace('#','');
+
+        var self = this;
         var location = window.location;
         var root = location.pathname.replace(/[^\/]$/, '$&');
-        var self = this;
         var url = root + location.search + '#!/' + hash;
 
         if(history.pushState) history.pushState(null, document.title, url);
@@ -393,13 +400,14 @@ define(['handlebars'],function(Handlebars){
 
         var handleBinding = function(event){
             if(pdef){
-                event.preventDefault ? event.preventDefault() : (event.returnValue = false);
+                if('preventDefault' in event) event.preventDefault();
+                else event.returnValue = false;
             }
             fn(event);
         };
 
         if(el.addEventListener) el.addEventListener(e, handleBinding, false);
-        else el.attachEvent('on'+e, handleBinding);
+        else el.attachEvent('on' + e, handleBinding);
         
     };
 
