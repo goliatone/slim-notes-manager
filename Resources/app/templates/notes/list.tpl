@@ -1,6 +1,6 @@
 <div class="row-fluid section-heading">
     <h2>Notes</h2>
-    <a href="note-create.html" class="btn btn-success right" type="button">
+    <a href="#!/note/create" class="btn btn-success right" type="button">
         <i class="icon-plus icon-white"></i>    Create Note
     </a>    
 </div>

@@ -10,7 +10,6 @@
                             <input type="text" placeholder="Slug" name="slug" class="input span" />
                       <br/>   
                             <textarea placeholder="Message" name="content"></textarea>
-                            
                             <div id="epiceditor"></div>
                         </form>
                         <div class="form-actions">

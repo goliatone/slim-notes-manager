@@ -7,17 +7,13 @@
                 <span class="icon-bar"></span>
             </button>
             <a class="brand" href="#/">YotoCMS</a>
-            <div class="nav-collapse collapse">
+            <div id="main-menu" class="nav-collapse collapse">
                 <ul class="nav">
-                    <li class="active"><a href="#/controller" >Dashboard</a></li>
-                    <li><a href="#/notes">Settings</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" data-ignore="trie">Notes <b class="caret"></b></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#/note/list">List</a></li>
-                            <li><a href="#/note/create">Create</a></li>
-                        </ul>
-                    </li>
+                    <li><a href="#/dashboard" >Dashboard</a></li>
+                    <li><a href="#/settings">Settings</a></li>
+                    <li><a href="#/note/list">List</a></li>
+                    <li><a href="#/note/create">Create</a></li>
+                        
                 </ul>
             </div><!--/.nav-collapse -->
         </div>

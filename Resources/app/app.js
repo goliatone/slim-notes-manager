@@ -2,6 +2,11 @@
 define(['handlebars'],function(Handlebars){
 
 /**
+ * TODO: Right now we need to add a div with module id where we want
+ *       it to be rendered, so to add a new module we have to add it to 
+ *       the boostrap file AND to the markup. Perhaps we can have a default
+ *       content id, and we get that from the module?
+ *       
  * TODO: Add parametrized routes.
  *
  * TODO: Support multiple templates for each module.
@@ -43,9 +48,11 @@ define(['handlebars'],function(Handlebars){
      */
     App.prototype.dependencies = {};
 
+    App.prototype.processed = {};
+
 
     App.prototype.initialize = function(){
-        console.log('initialize');
+        console.log('Initialize');
         var self = this;
         var moduleId;
         var module;
@@ -54,15 +61,17 @@ define(['handlebars'],function(Handlebars){
 
         //proxy to wireModules.
         require(this.modules, function(){
+            console.log('Require modules');
             for(var i=0, max = arguments.length; i < max; i++){
                 //module is actually its id.
                 moduleId = self.modules[i].split('/').pop();
-
+                console.log('Initialize module ', moduleId);
                 //TODO: Do we want to work with objects or constructors?
                 //typeof module === 'function' => constructor, we have to create it.
                 //typeof module === 'object' => instance.
                 module = arguments[i];
                 self.scope[moduleId] = module;
+                self.processed[moduleId] = false;
 
                 module.mid = moduleId;
                 module.el  = document.getElementById(moduleId);
@@ -86,11 +95,15 @@ define(['handlebars'],function(Handlebars){
         var hash = window.location.hash;
         var module;
         var route;
+        console.log('Initialize router');
+
         for(var moduleId in this.scope){
             if(!this.scope.hasOwnProperty(moduleId)) continue;
             module = this.scope[moduleId];
+            console.log('Initializing routes for ', moduleId);
             for(var routeId in module.routes ){
-                route = {id:moduleId, handler:module.routes[routeId]};
+                console.log('   ',moduleId, ' route: ', routeId);
+                route = {mid:moduleId, handler:module.routes[routeId], id:routeId};
                 //hide to method, just add the route and module.
                 if(this.routes.hasOwnProperty(routeId)){
                     // this.routes[route].push([moduleId, module.routes[route]]);
@@ -122,9 +135,8 @@ define(['handlebars'],function(Handlebars){
      * @param {String} fragment The current hash
      */
     App.prototype.loadUrl = function(hash){
-        console.log('loading hash ', hash);
+        console.log('- Loading hash ', hash);
         var lastModuleId;
-        var moduleId;
         var queryData = {};
         var i, t, route;
         hash = hash.replace('#!/','');
@@ -147,17 +159,22 @@ define(['handlebars'],function(Handlebars){
 
         for(var routeId in this.routes){
             if(!this.routes.hasOwnProperty(routeId)) continue;
-            for(i = 0, t = this.routes[routeId].length;i < t; i++){
+            for(i = 0, t = this.routes[routeId].length; i < t; i++){
                 route = this.routes[routeId][i];
-                moduleId = route.id;
-                console.log('moduel name ',moduleId, lastModuleId);
+                console.log('Module name ',route.mid, ' prev module id ', lastModuleId,' active route ', this.activeRoute);
                 if(this.activeRoute === routeId || routeId === '*'){
                     //TODO: Include in first if.
-                    if(lastModuleId === moduleId) continue;
-                    lastModuleId =  moduleId;
-                    this.processor(moduleId, route.handler, queryData);
+                    if(lastModuleId === route.mid) continue;
+                    lastModuleId =  route.mid;
+                    if(this.processed[route.mid] === false)
+                        this.processor(route.mid, route.handler, queryData);
+                    else{
+                        var scope = this.scope[route.mid];
+                         scope[route.handler](queryData);
+                    }
+
                 } else {
-                    this.unrender(moduleId);
+                    this.unrender(route.mid);
                 }
             }
         }
@@ -173,19 +190,19 @@ define(['handlebars'],function(Handlebars){
      * @param {Object} queryData The data from any url query strings
      */
     App.prototype.processor = function(module, route_fn, queryData){
-        console.log('processor ', module, route_fn, queryData);
+        console.log('processor ', module, route_fn);
 
         var self  = this;
         var scope = this.scope[module];
 
-        scope.loaded = true;
+        
 
         //we are assuming that each controller has a template. wrong?
         //we should declare our templates in the module.
         //one module/controller can have more than one template,
         //one template per action/route.
         if('templates' in scope){
-            
+            console.log('we are inside loading templates');
             //instances template cache.
             // scope.templates = {};
             // scope.templates.__loaded__ = {};
@@ -194,24 +211,28 @@ define(['handlebars'],function(Handlebars){
             //ASSUME THAT WE WANT TO LOAD A TEMPLATE WITH MID.
             var templates = scope.templates;
 
-            if(this.isEmptyObject(templates) && !('skipTemplates' in scope)){
+            if(this.isEmptyObject(templates) &&
+               !('skipTemplates' in scope)){
                 templates[scope.mid] = '';
             }
 
             var current = 0;
             var total   = this.objectLength(templates);
             $.each(templates, function(templateId, templateValue) {
-                console.log('****** Loading stuff for ', templateId, templateValue);
+                console.log('****** Loading stuff for ', templateId);
                 self.ajax({
                     url:self.templateUrl(templateId),
                     type:'GET',
                     success:function(data){
                         // templates[template] = data;
                         scope.templates[templateId] = data;
-                        console.log('===== Loaded template ',templateId);
+                        console.log('===== Loaded template ',templateId, ' cur ', current+1, ' tot ', total);
                         if(++current === total ){
                             console.log('Loaded all templates for ', module);
                             self.loadDependencies(scope, function(){
+                                console.log('Loaded all dependencies for ', scope.mid);
+                                scope.loaded = true;
+                                self.processed[module] = true;
                                 scope[route_fn](queryData);
                             });
                         }
@@ -241,6 +262,7 @@ define(['handlebars'],function(Handlebars){
             
             this.ajax(o);*/
         } else {
+            console.log('we are in dependencies')
             self.loadDependencies(scope, function(){
                 scope[route_fn](queryData);
             });
@@ -269,12 +291,13 @@ define(['handlebars'],function(Handlebars){
         var names = [];
         var srcs = [];
 
-        if(scope.hasOwnProperty('dependencies')){
+        if('dependencies' in scope){
             for(var dep in scope.dependencies){
-                if(scope.depencencies.hasOwnProperty(dep)){
+
+                if(scope.dependencies.hasOwnProperty(dep)){
                     name = dep;
                     src = scope.dependencies[dep];
-
+                    
                     if(self.dependencies.hasOwnProperty(src)){
                         scope[name] = self.dependencies[src];
                     } else {
@@ -295,6 +318,7 @@ define(['handlebars'],function(Handlebars){
                     callback(scope);
             });
         } else {
+            console.log('+++++++WE DONT HAVE DEPENDENCIES ', scope.mid);
             //module no dependent
             //TODO: DRY, trigger event!
             if(callback && typeof callback === 'function')
@@ -320,6 +344,9 @@ define(['handlebars'],function(Handlebars){
 
         //TODO: WHAT DO WE DO WHEN el IS NULL?
         var el = document.getElementById(scope.mid);
+        if(!el){
+            console.log('Element for module ', scope.mid, ' not included in markup');
+        }
 
         //TODO: We should be caching all this cruft.
         //TODO: Inject renderer, its just a method
@@ -361,6 +388,7 @@ define(['handlebars'],function(Handlebars){
         if(!scope.hasOwnProperty('loaded')){
             self.loadDependencies(scope, function(scope){
                 scope.loaded = true;
+                console.log('Access, dependencies loaded');
                 //TODO: DRY, trigger event!
                 if(callback && typeof callback === 'function'){
                     callback(scope);
