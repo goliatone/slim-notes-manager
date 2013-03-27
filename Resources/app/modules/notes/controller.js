@@ -44,23 +44,21 @@ define(function(){
         console.log('create notes');
         this.render(data, 'notes/create');
 
-        if(!this.editor){
-            var self = this;
-            var $textarea = $('textarea[name=content]');
-            $textarea.hide();
-            var opts =
-            {
-                container: 'epiceditor',
-                basePath:'../plugins/epiceditor',
-                textarea:$textarea,
-                focusOnLoad: true
-            };
-            // console.log('textarea ', $('textarea[name=content]'));
-            // console.log('epiceditor ', $('body').html());
-            self.editor = new EpicEditor(opts);//.load();
-            
-            self.editor.load();
-        }
+        var self = this;
+        var $textarea = $('textarea[name=content]');
+        $textarea.hide();
+        var opts =
+        {
+            container: 'epiceditor',
+            basePath:'../plugins/epiceditor',
+            textarea:$textarea,
+            focusOnLoad: true
+        };
+        // console.log('textarea ', $('textarea[name=content]'));
+        // console.log('epiceditor ', $('body').html());
+        self.editor = new EpicEditor(opts);//.load();
+        
+        self.editor.load();
     };
 
     NotesController.prototype.delete = function(data){

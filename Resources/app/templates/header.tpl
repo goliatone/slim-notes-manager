@@ -1,1 +1,1 @@
-<h1>ColtJS Demo</h1>
+<h1>YOTO CMS Demo</h1>

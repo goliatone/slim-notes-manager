@@ -161,22 +161,29 @@ define(['handlebars'],function(Handlebars){
             if(!this.routes.hasOwnProperty(routeId)) continue;
             for(i = 0, t = this.routes[routeId].length; i < t; i++){
                 route = this.routes[routeId][i];
-                console.log('Module name ',route.mid, ' prev module id ', lastModuleId,' active route ', this.activeRoute);
+                this.unrender(route.mid);
+            }
+        }
+
+        for(var routeId in this.routes){
+            if(!this.routes.hasOwnProperty(routeId)) continue;
+            for(i = 0, t = this.routes[routeId].length; i < t; i++){
+                route = this.routes[routeId][i];
                 if(this.activeRoute === routeId || routeId === '*'){
                     //TODO: Include in first if.
-                    if(lastModuleId === route.mid) continue;
-                    lastModuleId =  route.mid;
-                    if(this.processed[route.mid] === false)
-                        this.processor(route.mid, route.handler, queryData);
-                    else{
-                        var scope = this.scope[route.mid];
-                         scope[route.handler](queryData);
-                    }
 
-                } else {
-                    this.unrender(route.mid);
+                    if(lastModuleId === route.mid) continue;
+
+                    lastModuleId =  route.mid;
+                    if(this.processed[route.mid] === false){
+                        this.processor(route.mid, route.handler, queryData);
+                    }else{
+                        var scope = this.scope[route.mid];
+                        scope[route.handler](queryData);
+                    }
                 }
             }
+
         }
     };
 
@@ -338,6 +345,7 @@ define(['handlebars'],function(Handlebars){
     App.prototype.render = function(scope, data, templateId){
         templateId = templateId || scope.mid;
 
+        // console.log(' == DO RENDER ',scope.mid, templateId);
         var template = scope.templates[templateId];
         // console.log('Template is: ', template);
         // console.log('scope: ', scope);
@@ -370,6 +378,7 @@ define(['handlebars'],function(Handlebars){
      * @param {String} moduleId The name of the module to unrender
      */
     App.prototype.unrender = function(moduleId){
+        console.log(' -- DO UNRENDER!', moduleId);
         document.getElementById(moduleId).innerHTML = '';
         document.getElementById(moduleId).style.display = 'none';
     };

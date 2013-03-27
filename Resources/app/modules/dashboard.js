@@ -7,6 +7,7 @@ define(function(){
 	};
 	
 	Dashboard.prototype.routes = {
+		'' : 'render',
 		'dashboard' : 'render'
 	};
 
