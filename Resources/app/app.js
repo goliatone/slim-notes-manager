@@ -1,12 +1,12 @@
-/*global define:true, require:true, EpicEditor:true*/
+/*global define:true, require:true, EpicEditor:true, Ti:true*/
 define(['handlebars'],function(Handlebars){
 
 /**
  * TODO: Right now we need to add a div with module id where we want
- *       it to be rendered, so to add a new module we have to add it to 
+ *       it to be rendered, so to add a new module we have to add it to
  *       the boostrap file AND to the markup. Perhaps we can have a default
  *       content id, and we get that from the module?
- *       
+ *
  * TODO: Add parametrized routes.
  *
  * TODO: Support multiple templates for each module.
@@ -21,8 +21,16 @@ define(['handlebars'],function(Handlebars){
 
     var defaultConfig = {
         hashFragment:'#!/',
-        templateExtension:'tpl'
+        templateExtension:'tpl',
+        loader:'ajaxLoader',
+        basePath:''
     };
+
+    if(typeof Ti !== 'undefined'){
+        console.log('WE HAVE DESKTOP APP');
+        defaultConfig.loader = 'fileLoader';
+        defaultConfig.basePath = Ti.API.application.getResourcesPath();
+    }
 
     var App = function(config){
         console.log('Hola');
@@ -59,9 +67,12 @@ define(['handlebars'],function(Handlebars){
         //Cheat, fuck it.
         window.App = this;
 
+        //TODO: Double check we have valid method.
+        this.loader = this[defaultConfig.loader];
+
         //proxy to wireModules.
         require(this.modules, function(){
-            console.log('Require modules');
+            console.log('Require modules ', arguments);
             for(var i=0, max = arguments.length; i < max; i++){
                 //module is actually its id.
                 moduleId = self.modules[i].split('/').pop();
@@ -85,7 +96,7 @@ define(['handlebars'],function(Handlebars){
 
         //Shim bind
         if(!Function.prototype.bind){
-            this.shim_bind();
+            this.shimBind();
         }
     };
 
@@ -157,6 +168,11 @@ define(['handlebars'],function(Handlebars){
 
         this.queryData = queryData;
 
+        //TODO: DRY, we can move to walk, and the provide the actual
+        //logic that is different for both loops.
+        
+        //TODO: This seems inefficient, we first unrender all
+        //and then render the active stuff...DOES IT MAKE SENSE?!
         for(var routeId in this.routes){
             if(!this.routes.hasOwnProperty(routeId)) continue;
             for(i = 0, t = this.routes[routeId].length; i < t; i++){
@@ -227,11 +243,14 @@ define(['handlebars'],function(Handlebars){
             var total   = this.objectLength(templates);
             $.each(templates, function(templateId, templateValue) {
                 console.log('****** Loading stuff for ', templateId);
-                self.ajax({
+                
+                self.loader({
                     url:self.templateUrl(templateId),
                     type:'GET',
                     success:function(data){
                         // templates[template] = data;
+                        console.log(arguments);
+
                         scope.templates[templateId] = data;
                         console.log('===== Loaded template ',templateId, ' cur ', current+1, ' tot ', total);
                         if(++current === total ){
@@ -245,7 +264,7 @@ define(['handlebars'],function(Handlebars){
                         }
                     },
                     error:function(){
-                        console.log('Error loading template '+templateId+'.tpl');
+                        console.log('Error loading template '+templateId+'.'+defaultConfig.templateExtension);
                     }
                 });
             });
@@ -277,7 +296,10 @@ define(['handlebars'],function(Handlebars){
     };
 
     App.prototype.templateUrl = function(templateId, ext){
-        return 'app/templates/'+ templateId +'.tpl';
+        // return 'app/templates/'+ templateId +'.'+defaultConfig.templateExtension;
+        
+        return defaultConfig.basePath+'/app/templates/'+ templateId +'.'+defaultConfig.templateExtension;
+        return '/Users/emilianoburgos/Development/JS/yotoManager/Resources/app/templates/'+ templateId +'.'+defaultConfig.templateExtension;
     };
 
     App.prototype.loadTemplate = function(scope, callback){
@@ -347,7 +369,11 @@ define(['handlebars'],function(Handlebars){
 
         // console.log(' == DO RENDER ',scope.mid, templateId);
         var template = scope.templates[templateId];
-        // console.log('Template is: ', template);
+        console.log('Template is: ', typeof template);
+        console.log(template);
+        console.log(template.textContent);
+        console.log(template.innerHTML);
+        if(typeof template !== 'string') return console.log('WHAT THE HELL!!!');
         // console.log('scope: ', scope);
 
         //TODO: WHAT DO WE DO WHEN el IS NULL?
@@ -378,7 +404,6 @@ define(['handlebars'],function(Handlebars){
      * @param {String} moduleId The name of the module to unrender
      */
     App.prototype.unrender = function(moduleId){
-        console.log(' -- DO UNRENDER!', moduleId);
         document.getElementById(moduleId).innerHTML = '';
         document.getElementById(moduleId).style.display = 'none';
     };
@@ -505,7 +530,20 @@ define(['handlebars'],function(Handlebars){
         
     };
 
-    App.prototype.ajax = function(){
+    App.prototype.fileLoader = function(loader){
+        console.log('*****************************')
+        console.log('loader ',loader);
+        var fi = Ti.Filesystem.getFile(loader.url);
+        var content = '', line;
+        while(line = fi.readLine()){
+            content += line+'\n';
+        }
+        console.log(content);
+        console.log('-------------');
+        loader.success(content);
+    };
+
+    App.prototype.ajaxLoader = function(){
         if(typeof jQuery === 'undefined')
             throw Error('App needs ajax layer support.');
 
@@ -513,11 +551,30 @@ define(['handlebars'],function(Handlebars){
     };
 
     //TODO: Move to helper?
+    App.prototype.shimBind = function () {
+        Function.prototype.bind = function (obj) {
+            // closest thing possible to the ECMAScript 5 internal IsCallable function
+            if (typeof this !== "function") {
+                throw new TypeError("Function.prototype.bind - what is trying to be bound is not callable");
+            }
+
+            var slice = [].slice,
+                args = slice.call(arguments, 1),
+                self = this,
+                nop = function () { },
+                bound = function () {
+                    return self.apply(this instanceof nop ? this : (obj || {}),
+                                      args.concat(slice.call(arguments)));
+                };
+
+            bound.prototype = this.prototype;
+
+            return bound;
+        };
+    };
     App.prototype.isEmptyObject = function( obj ) {
         var name;
-        for ( name in obj ) {
-            return false;
-        }
+        for ( name in obj ) return false;       
         return true;
     };
 
@@ -526,10 +583,10 @@ define(['handlebars'],function(Handlebars){
 
         for (prop in obj) {
             if (obj.hasOwnProperty(prop)) count++;
-            
         }
+
         return count;
-    }
+    };
 
     return App;
 });

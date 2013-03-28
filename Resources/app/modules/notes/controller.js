@@ -11,15 +11,15 @@ define(function(){
     };
 
     NotesController.prototype.templates = {
-        'notes/create':'',
-        'notes/edit':'',
-        'notes/list':''
+        'notes/create':'empty',
+        'notes/edit':'empty',
+        'notes/list':'empty'
     };
 
     NotesController.prototype.routes = {
         'note/list' : 'list',
         'note/edit' : 'edit',
-        'note/delete' : 'delete',
+        'note/delete' : 'doDelete',
         'note/create' : 'create'
     };
 
@@ -61,7 +61,7 @@ define(function(){
         self.editor.load();
     };
 
-    NotesController.prototype.delete = function(data){
+    NotesController.prototype.doDelete = function(data){
         console.log('delete notes');
         this.render(data, 'notes/delete');
     };
