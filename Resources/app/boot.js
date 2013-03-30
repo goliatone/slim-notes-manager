@@ -2,17 +2,21 @@ require.config({
     shim: {
         'handlebars': {
             exports: 'Handlebars'
+        },
+        'dropbox':{
+            exports:'Dropbox'
         }
     },
     // Libraries
     paths: {
         'bootstrap': '../javascripts/vendors/bootstrap/bootstrap',
         // 'bootstrap-datepicker': '../javascripts/vendors/bootstrap/bootstrap.datepicker',
-        // 'date.format': '../javascripts/vendors/js-yaml',
-        // 'js-yaml': '../javascripts/vendors/date.format',
+        'jsyaml': '../javascripts/vendors/js-yaml',
+        'dateformat': '../javascripts/vendors/date.format',
         // 'epiceditor': '../plugins/epiceditor/js/epiceditor',
-        'handlebars': '../javascripts/vendors/handlebars'
+        'handlebars': '../javascripts/vendors/handlebars',
+        'dropbox': 'libs/dropbox.min'
     }
 });
 
-require(['main', 'bootstrap', 'handlebars']);
+require(['main', 'bootstrap', 'handlebars', 'dropbox']);

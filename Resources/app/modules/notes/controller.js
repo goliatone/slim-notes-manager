@@ -1,13 +1,17 @@
 /*global define:true, App:true, EpicEditor:true*/
 define(function(){
 
-    var NotesController = function(){};
+    var NotesController = function(){
+
+    };
 
     NotesController.prototype.dependencies = {
         'bootstrap-datepicker': '../javascripts/vendors/bootstrap/bootstrap.datepicker',
-        'date.format': '../javascripts/vendors/js-yaml',
-        'js-yaml': '../javascripts/vendors/date.format',
-        'epiceditor': '../plugins/epiceditor/js/epiceditor'
+        'jsyaml': '/javascripts/vendors/js-yaml.js',
+        'date.format': '../javascripts/vendors/date.format',
+        'epiceditor': '../plugins/epiceditor/js/epiceditor',
+        'Sync': 'utils/sync',
+        'Note': 'modules/notes/model'
     };
 
     NotesController.prototype.templates = {
@@ -25,6 +29,13 @@ define(function(){
 
     NotesController.prototype.list = function(data){
         console.log('>>> list notes');
+        var notes = this.Sync.getAllNotes();
+        console.log("------- ", notes);
+
+        var note = new this.Note();
+        note.title = 'test';
+        note.content = 'hola, how are you doing';
+        console.log('This is a note ', note);
          var data = { notes: [
          {id:1, title:'Hello YotoManager', date:'2013-03-17', content:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non auctor massa. Duis id tortor consequat odio pharetra fringilla. Suspendisse aliquam, metus hendrerit ullamcorper commodo, ipsum nisi volutpat nisl, vel ultrices lorem mi vulputate magna. Vivamus sit amet sagittis odio.'},
          {id:2, title:'I can Haz Templates', date:'2013-03-18', content:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec non auctor massa. Duis id tortor consequat odio pharetra fringilla. Suspendisse aliquam, metus hendrerit ullamcorper commodo, ipsum nisi volutpat nisl, vel ultrices lorem mi vulputate magna. Vivamus sit amet sagittis odio.'},

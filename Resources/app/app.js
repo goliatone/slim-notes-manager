@@ -32,9 +32,9 @@ define(['handlebars'],function(Handlebars){
         defaultConfig.basePath = Ti.API.application.getResourcesPath();
     }
 
-    var App = function(config){
+    var App = function(config, dropbox){
         console.log('Hola');
-
+        this.dropbox = dropbox;
     };
 
     /**
@@ -58,6 +58,9 @@ define(['handlebars'],function(Handlebars){
 
     App.prototype.processed = {};
 
+    App.prototype.showError = function(e){
+        console.log(e);
+    };
 
     App.prototype.initialize = function(){
         console.log('Initialize');
@@ -72,7 +75,7 @@ define(['handlebars'],function(Handlebars){
 
         //proxy to wireModules.
         require(this.modules, function(){
-            console.log('Require modules ', arguments);
+            // console.log('Require modules ', arguments);
             for(var i=0, max = arguments.length; i < max; i++){
                 //module is actually its id.
                 moduleId = self.modules[i].split('/').pop();
@@ -111,9 +114,9 @@ define(['handlebars'],function(Handlebars){
         for(var moduleId in this.scope){
             if(!this.scope.hasOwnProperty(moduleId)) continue;
             module = this.scope[moduleId];
-            console.log('Initializing routes for ', moduleId);
+            // console.log('Initializing routes for ', moduleId);
             for(var routeId in module.routes ){
-                console.log('   ',moduleId, ' route: ', routeId);
+                // console.log('   ',moduleId, ' route: ', routeId);
                 route = {mid:moduleId, handler:module.routes[routeId], id:routeId};
                 //hide to method, just add the route and module.
                 if(this.routes.hasOwnProperty(routeId)){
@@ -242,21 +245,21 @@ define(['handlebars'],function(Handlebars){
             var current = 0;
             var total   = this.objectLength(templates);
             $.each(templates, function(templateId, templateValue) {
-                console.log('****** Loading stuff for ', templateId);
+                // console.log('****** Loading stuff for ', templateId);
                 
                 self.loader({
                     url:self.templateUrl(templateId),
                     type:'GET',
                     success:function(data){
                         // templates[template] = data;
-                        console.log(arguments);
+                        // console.log(arguments);
 
                         scope.templates[templateId] = data;
-                        console.log('===== Loaded template ',templateId, ' cur ', current+1, ' tot ', total);
+                        // console.log('===== Loaded template ',templateId, ' cur ', current+1, ' tot ', total);
                         if(++current === total ){
-                            console.log('Loaded all templates for ', module);
+                            // console.log('Loaded all templates for ', module);
                             self.loadDependencies(scope, function(){
-                                console.log('Loaded all dependencies for ', scope.mid);
+                                // console.log('Loaded all dependencies for ', scope.mid);
                                 scope.loaded = true;
                                 self.processed[module] = true;
                                 scope[route_fn](queryData);
@@ -288,7 +291,7 @@ define(['handlebars'],function(Handlebars){
             
             this.ajax(o);*/
         } else {
-            console.log('we are in dependencies')
+            // console.log('we are in dependencies')
             self.loadDependencies(scope, function(){
                 scope[route_fn](queryData);
             });
@@ -296,10 +299,8 @@ define(['handlebars'],function(Handlebars){
     };
 
     App.prototype.templateUrl = function(templateId, ext){
-        // return 'app/templates/'+ templateId +'.'+defaultConfig.templateExtension;
         
         return defaultConfig.basePath+'/app/templates/'+ templateId +'.'+defaultConfig.templateExtension;
-        return '/Users/emilianoburgos/Development/JS/yotoManager/Resources/app/templates/'+ templateId +'.'+defaultConfig.templateExtension;
     };
 
     App.prototype.loadTemplate = function(scope, callback){
@@ -347,7 +348,7 @@ define(['handlebars'],function(Handlebars){
                     callback(scope);
             });
         } else {
-            console.log('+++++++WE DONT HAVE DEPENDENCIES ', scope.mid);
+            // console.log('+++++++WE DONT HAVE DEPENDENCIES ', scope.mid);
             //module no dependent
             //TODO: DRY, trigger event!
             if(callback && typeof callback === 'function')
@@ -369,10 +370,10 @@ define(['handlebars'],function(Handlebars){
 
         // console.log(' == DO RENDER ',scope.mid, templateId);
         var template = scope.templates[templateId];
-        console.log('Template is: ', typeof template);
-        console.log(template);
-        console.log(template.textContent);
-        console.log(template.innerHTML);
+        // console.log('Template is: ', typeof template);
+        // console.log(template);
+        // console.log(template.textContent);
+        // console.log(template.innerHTML);
         if(typeof template !== 'string') return console.log('WHAT THE HELL!!!');
         // console.log('scope: ', scope);
 
@@ -422,7 +423,7 @@ define(['handlebars'],function(Handlebars){
         if(!scope.hasOwnProperty('loaded')){
             self.loadDependencies(scope, function(scope){
                 scope.loaded = true;
-                console.log('Access, dependencies loaded');
+                // console.log('Access, dependencies loaded');
                 //TODO: DRY, trigger event!
                 if(callback && typeof callback === 'function'){
                     callback(scope);
@@ -531,15 +532,15 @@ define(['handlebars'],function(Handlebars){
     };
 
     App.prototype.fileLoader = function(loader){
-        console.log('*****************************')
-        console.log('loader ',loader);
+        // console.log('*****************************')
+        // console.log('loader ',loader);
         var fi = Ti.Filesystem.getFile(loader.url);
         var content = '', line;
         while(line = fi.readLine()){
             content += line+'\n';
         }
-        console.log(content);
-        console.log('-------------');
+        // console.log(content);
+        // console.log('-------------');
         loader.success(content);
     };
 
