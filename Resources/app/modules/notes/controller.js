@@ -61,14 +61,11 @@ define(function(){
         note.content = 'hola, how are you doing';
         console.log('This is a note ', note);
         
-        //TODO: Rename directory notes to note, so that 
+        //TODO: Rename directory notes to note, so that
         //it matches url pattern.
         this.render(this.notes, 'notes/list');
-        var widgets = $('.Widget').each(function(){
-            var widget = $(this).data('widget');
-            console.log(widget)
-        });
-        // var widgets = $('*').filter(function(){return $(this).data('widget') !== undefined;});
+
+        
         // 
         var self = this;
 

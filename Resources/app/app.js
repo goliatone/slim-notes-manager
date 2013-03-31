@@ -399,8 +399,32 @@ define(['handlebars'],function(Handlebars){
         el.innerHTML = rendered;
         el.style.display = 'block';
 
+        this.loadWidgets(scope);
+
         this.delegateEvent(scope.events, scope);
 
+    };
+
+    App.prototype.loadWidgets = function(scope){
+        //TODO: Move to main class, fire event after render.
+        //plug in widget manager. It will load the required class
+        //and initiate, we pass in the module to the widget as owner.
+        var widgetPaths = [];
+        var widgets = $('.Widget').each(function(){
+            var widget = $(this).data('widget');
+            console.log(widget);
+            if(widgetPaths.indexOf('widgets/'+widget) === -1)
+                widgetPaths.push('widgets/'+widget);
+        });
+        console.log('====================');
+        console.log(widgetPaths);
+        require(widgetPaths, function(){
+            console.log('done');
+            for(var i=0, max = arguments.length; i < max; i++){
+                console.log(arguments[i]);
+            }
+        });
+        console.log('====================');
     };
 
     /**
