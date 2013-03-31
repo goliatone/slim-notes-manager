@@ -170,6 +170,9 @@ define(['handlebars'],function(Handlebars){
         this.activeRoute = hash[0];
 
         this.queryData = queryData;
+        //TODO: How should we encapsulate data?!
+        this.queryData.__data = $.extend( {}, this.navigateData);
+        this.navigateData = null;
 
         //TODO: DRY, we can move to walk, and the provide the actual
         //logic that is different for both loops.
@@ -195,8 +198,11 @@ define(['handlebars'],function(Handlebars){
 
                     lastModuleId =  route.mid;
                     if(this.processed[route.mid] === false){
+                        console.log('We are first rendering ', route.mid);
+
                         this.processor(route.mid, route.handler, queryData);
                     }else{
+                        console.log('We are updateing self!!! ', route.mid);
                         var scope = this.scope[route.mid];
                         scope[route.handler](queryData);
                     }
@@ -216,7 +222,7 @@ define(['handlebars'],function(Handlebars){
      * @param {Object} queryData The data from any url query strings
      */
     App.prototype.processor = function(module, route_fn, queryData){
-        console.log('processor ', module, route_fn);
+        console.log('>>>> processor ', module, route_fn);
 
         var self  = this;
         var scope = this.scope[module];
@@ -394,6 +400,7 @@ define(['handlebars'],function(Handlebars){
         el.style.display = 'block';
 
         this.delegateEvent(scope.events, scope);
+
     };
 
     /**
@@ -445,8 +452,11 @@ define(['handlebars'],function(Handlebars){
      * @param  {String} fragment The location to be loaded
      * @return {Boolean}
      */
-    App.prototype.navigate = function(hash){
+    App.prototype.navigate = function(hash, data){
         console.log('Navigate hash ', hash);
+        
+        this.navigateData = data;
+
         hash = hash.replace('#','');
 
         var self = this;
@@ -575,7 +585,7 @@ define(['handlebars'],function(Handlebars){
     };
     App.prototype.isEmptyObject = function( obj ) {
         var name;
-        for ( name in obj ) return false;       
+        for ( name in obj ) return false;
         return true;
     };
 
@@ -587,6 +597,22 @@ define(['handlebars'],function(Handlebars){
         }
 
         return count;
+    };
+
+    App.prototype.resolvePropertyChain=function(target, chain){
+        if (!chain && typeof target === 'string') {
+            chain  = target;
+            target = this;//We could use global if node.
+        }
+
+        if(typeof chain === 'string') chain = chain.split('.');
+        var l = chain.length, i = 0, p = '';
+        for (; i < l; i++ ) {
+            p = chain[i];
+            if ( target.hasOwnProperty( p ) ) target = target[ p ];
+            else return null;
+        }
+        return target;
     };
 
     return App;

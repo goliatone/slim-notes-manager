@@ -13,8 +13,12 @@
                             <div id="epiceditor"></div>
                         </form>
                         <div class="form-actions">
-                          <button type="submit" class="btn btn-primary">Save changes</button>
-                          <button type="button" class="btn">Cancel</button>
+                          <button type="submit" class="btn btn-primary" id="create-note-save">
+                            Save changes
+                          </button>
+                          <button type="button" class="btn" id="create-note-cancel">
+                            Cancel
+                          </button>
                         </div>
                         
                     </div>
@@ -33,7 +37,7 @@
          <div class="span4 well">
             <input type="text" placeholder="Name" name="field_name" class="input span" />
             <input type="text" placeholder="Value" name="categories" class="input span" />
-            <button class="btn btn-success btn-block">
+            <button class="btn btn-success btn-block" id="create-note-add-parameter">
               <i class="icon-plus icon-white"></i>Add Parameter
             </button>
           </div><!--/span--> 

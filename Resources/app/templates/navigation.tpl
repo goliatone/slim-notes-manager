@@ -11,9 +11,8 @@
                 <ul class="nav">
                     <li><a href="#/dashboard" >Dashboard</a></li>
                     <li><a href="#/settings">Settings</a></li>
-                    <li><a href="#/note/list">List</a></li>
-                    <li><a href="#/note/create">Create</a></li>
-                        
+                    <li><a href="#/note/list">Notes</a></li>
+                    <!-- <li><a href="#/note/create">Create</a></li> -->
                 </ul>
             </div><!--/.nav-collapse -->
         </div>

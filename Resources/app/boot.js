@@ -1,4 +1,6 @@
+/*global require:true*/
 require.config({
+    urlArgs: 'bust=v'+(new Date().getTime()),
     shim: {
         'handlebars': {
             exports: 'Handlebars'
@@ -9,14 +11,14 @@ require.config({
     },
     // Libraries
     paths: {
-        'bootstrap': '../javascripts/vendors/bootstrap/bootstrap',
+        'bootstrap': 'libs/bootstrap/bootstrap',
         // 'bootstrap-datepicker': '../javascripts/vendors/bootstrap/bootstrap.datepicker',
-        'jsyaml': '../javascripts/vendors/js-yaml',
-        'dateformat': '../javascripts/vendors/date.format',
-        // 'epiceditor': '../plugins/epiceditor/js/epiceditor',
-        'handlebars': '../javascripts/vendors/handlebars',
+        'jsyaml': 'libs/js-yaml',
+        'dateformat': 'libs/date.format',
+        'epiceditor': 'libs/epiceditor/js/epiceditor',
+        'handlebars': 'libs/handlebars',
         'dropbox': 'libs/dropbox.min'
     }
 });
 
-require(['main', 'bootstrap', 'handlebars', 'dropbox']);
+require(['main', 'bootstrap', 'handlebars'/*, 'dropbox'*/]);

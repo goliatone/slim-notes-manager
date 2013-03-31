@@ -4,13 +4,13 @@
  * Its the sell.
  */
 /*global define:true, Dropbox:true*/
-define(['app','handlebars','dropbox'], function(App, Handlebars, Dropbox) {
+define(['app','handlebars'/*,'dropbox'*/], function(App, Handlebars, Dropbox) {
    console.log('test');
 
    //TODO: Modularize, and do event driven shait!
-   var client = new Dropbox.Client({
+   var client;/* = new Dropbox.Client({
        key: 'EkJsaJ8XFVA=|RPorHRP3qrB42A5gcDxpEJ3EVl6EL8qw0bxoEhD22g==', sandbox: true
-   });
+   });*/
 
    var app = new App({}, client);
 
@@ -18,7 +18,7 @@ define(['app','handlebars','dropbox'], function(App, Handlebars, Dropbox) {
    //page. lets start by metadata ;) we can generate it from
    //backend template and it should be self contained.
    app.modules = [
-      'modules/ui/header',
+      // 'modules/ui/header',
       'modules/ui/navigation',
       'modules/notes/controller',
       'modules/dashboard',
@@ -26,9 +26,9 @@ define(['app','handlebars','dropbox'], function(App, Handlebars, Dropbox) {
       // 'modules/notes/edit',
       // 'modules/notes/list'
    ];
-
+app.initialize();
    
-
+/*
    client.authDriver(new Dropbox.Drivers.Redirect());
    client.authenticate(function(error, client) {
         if (error) {
@@ -61,7 +61,7 @@ define(['app','handlebars','dropbox'], function(App, Handlebars, Dropbox) {
             });
         });
    });
-
+*/
    
 
    
