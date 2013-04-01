@@ -7,7 +7,7 @@
 <div class="row-fluid">
     <div id="notes-holder" class="span">
         {{#notes}}
-		<div id="note-{{id}}" class="note-holder row-fluid Widget" data-widget="NoteWidget">
+		<div id="note-{{id}}" class="note-holder row-fluid Widget" data-widget="note">
 		    <div class="span note-entry">
 		        <div class="btn-group actions" data-parent-id="{{id}}">
 		            <button type="button" class="btn action-toolbar-btn" data-action="preview"><i class="icon-eye-open"></i></button>
@@ -22,7 +22,7 @@
 		{{/notes}}
     </div>
     <div class="push"></div>
-    <div class="pagination Widget" data-widget='PaginationWidget'>
+    <div class="pagination Widget" data-widget='pagination'>
         <ul>
             <li><a href="#">&laquo;</a></li>
             <li><a href="#">1</a></li>

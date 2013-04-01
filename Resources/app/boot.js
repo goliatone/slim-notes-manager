@@ -5,6 +5,13 @@ require.config({
         'handlebars': {
             exports: 'Handlebars'
         },
+        'jquery': {
+            exports: '$'
+        },
+        //We need to explicitly declare $ dependency here. Else fail!
+        'bootstrap':{
+            deps: ['jquery']
+        },
         'dropbox':{
             exports:'Dropbox'
         }
@@ -13,12 +20,14 @@ require.config({
     paths: {
         'bootstrap': 'libs/bootstrap/bootstrap',
         // 'bootstrap-datepicker': '../javascripts/vendors/bootstrap/bootstrap.datepicker',
+        'jquery':'libs/jquery',
         'jsyaml': 'libs/js-yaml',
         'dateformat': 'libs/date.format',
         'epiceditor': 'libs/epiceditor/js/epiceditor',
         'handlebars': 'libs/handlebars',
-        'dropbox': 'libs/dropbox.min'
+        'dropbox': 'libs/dropbox.min',
+        'widgets':'widgets'
     }
 });
 
-require(['main', 'bootstrap', 'handlebars'/*, 'dropbox'*/]);
+require(['main','jquery', 'bootstrap', 'handlebars'/*, 'dropbox'*/]);

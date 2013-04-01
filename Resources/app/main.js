@@ -2,6 +2,9 @@
  * Main should initalize app and ensure it runs from the right
  * state. IE, load config, detect language.
  * Its the sell.
+ *
+ * READ:
+ * http://www.ericfeminella.com/blog/2012/12/15/basic-dependency-injection-with-requirejs/
  */
 /*global define:true, Dropbox:true*/
 define(['app','handlebars'/*,'dropbox'*/], function(App, Handlebars, Dropbox) {

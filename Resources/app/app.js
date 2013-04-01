@@ -1,5 +1,5 @@
 /*global define:true, require:true, EpicEditor:true, Ti:true*/
-define(['handlebars'],function(Handlebars){
+define(['handlebars', 'jquery'],function(Handlebars, $){
 
 /**
  * TODO: Right now we need to add a div with module id where we want
@@ -314,6 +314,9 @@ define(['handlebars'],function(Handlebars){
     };
 
     /**
+     * TODO: Refactor so that we can take in an object/array with dependencies
+     *       instead of actually sucking those from scope.
+     *
      * @method loadDependencies
      *
      * Checks for & loads any dependencies before calling the route's function
@@ -399,7 +402,8 @@ define(['handlebars'],function(Handlebars){
         el.innerHTML = rendered;
         el.style.display = 'block';
 
-        this.loadWidgets(scope);
+        //TODO: Figure out why this does not work?!
+        // this.loadWidgets(scope);
 
         this.delegateEvent(scope.events, scope);
 
@@ -410,20 +414,29 @@ define(['handlebars'],function(Handlebars){
         //plug in widget manager. It will load the required class
         //and initiate, we pass in the module to the widget as owner.
         var widgetPaths = [];
+        var w = {};
         var widgets = $('.Widget').each(function(){
             var widget = $(this).data('widget');
             console.log(widget);
-            if(widgetPaths.indexOf('widgets/'+widget) === -1)
-                widgetPaths.push('widgets/'+widget);
+            if(widgetPaths.indexOf('widgets/'+widget) !== -1) return;
+
+            w[widget] = 'widgets/'+widget;
+            widgetPaths.push('widgets/'+widget);
         });
         console.log('====================');
-        console.log(widgetPaths);
+        console.log('paths: ',w);
+        console.log('paths: ',widgetPaths);
         require(widgetPaths, function(){
             console.log('done');
             for(var i=0, max = arguments.length; i < max; i++){
                 console.log(arguments[i]);
+                scope['Widget'+i] = arguments[i];
             }
         });
+        // scope.dependencies = $.extend( scope.dependencies ? scope.dependencies : {}, w );
+        // this.loadDependencies(scope, function(){
+        //     console.log('yuo')
+        // });
         console.log('====================');
     };
 

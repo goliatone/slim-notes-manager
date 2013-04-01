@@ -1,5 +1,5 @@
 /*global define:true, App:true*/
-define(function(){
+define(['jquery'], function($){
 	var Dashboard = function(){};
 
 	Dashboard.prototype.templates = {

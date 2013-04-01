@@ -1,6 +1,6 @@
 /*global define:true, App:true*/
-define(function(){
-
+define(['jquery'], function($){
+	
 	var Settings = function(){};
 
 	Settings.prototype.templates = {
@@ -20,7 +20,6 @@ define(function(){
 	};
 
 	Settings.prototype.updateTab = function(e){
-		console.log('Update tab!', this, e);
 		$(e.target).tab('show');
 	};
 

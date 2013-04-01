@@ -1,5 +1,5 @@
 /*global define:true, App:true*/
-define(function(){
+define(['jquery'], function($){
 	var Navigation = function(){};
 
 	Navigation.prototype.templates = {};

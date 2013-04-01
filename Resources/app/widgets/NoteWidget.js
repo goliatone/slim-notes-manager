@@ -1,5 +1,6 @@
 /*global define:true, App:true*/
 define(function(){
+
 	var NoteWidget = function(){};
 
 	NoteWidget.prototype.initialize = function(){

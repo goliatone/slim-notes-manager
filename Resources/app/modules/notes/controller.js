@@ -1,5 +1,5 @@
 /*global define:true, App:true, EpicEditor:true*/
-define(function(){
+define(['jquery'], function($){
 
     var NotesController = function(){
         this.notes = { notes: [
@@ -20,11 +20,15 @@ define(function(){
 
     NotesController.prototype.dependencies = {
         'Sync': 'utils/sync',
+        'Binder': 'utils/binder',
         'jsyaml': 'libs/js-yaml',
         'date.format': 'libs/date.format',
         'epiceditor': 'libs/epiceditor/js/epiceditor',
         'bootstrap-datepicker': 'libs/bootstrap/bootstrap.datepicker',
         'Note': 'modules/notes/model'
+        //TODO: Ideally we would get this from DOM and then load.
+        ,'NoteWidget':'widgets/NoteWidget'
+        ,'PaginationWidget':'widgets/PaginationWidget'
     };
 
     NotesController.prototype.templates = {
@@ -65,8 +69,17 @@ define(function(){
         //it matches url pattern.
         this.render(this.notes, 'notes/list');
 
+        //TODO:Move pagination stuff here. Use pagination as
+        //widget, we listen to events from here. Pagination
+        //does not need to know about us, we just care about
+        //events, and to update its data/view.
+        this.pagination = new this.PaginationWidget();
+        this.pagination.owner = this;
+        this.pagination.initialize();
+
+        console.log(this);
+            
         
-        // 
         var self = this;
 
         $('.actions').on('click', 'button', function(){

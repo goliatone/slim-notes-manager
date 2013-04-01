@@ -1,5 +1,5 @@
 /*global define:true, Ti:true, EpicEditor:true*/
-define('dropbox',function(dropbox){
+define(function(dropbox){
 /**
  * TODO: Abstract in base class, have three implementations, one file
  * system based, using Ti, one using dropbox, and one using git.
