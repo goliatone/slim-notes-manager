@@ -1,6 +1,5 @@
 /*global define:true*/
 define(['jquery'], function($){
-    console.log($);
 
     var Binder = function(){};
 

@@ -1,5 +1,5 @@
 /*global define:true, require:true, EpicEditor:true, Ti:true*/
-define(['handlebars', 'jquery'],function(Handlebars, $){
+define(['handlebars', 'jquery', 'helpers'],function(Handlebars, $, helpers){
 
 /**
  * TODO: Right now we need to add a div with module id where we want
@@ -17,7 +17,25 @@ define(['handlebars', 'jquery'],function(Handlebars, $){
  * TODO: Add transitions, defer intro-outro callback. Hide current, show
  *       loader, hide loader, show content.
  *
+ * TODO: Implement a full blown event driven flow. Notify state and add
+ *       hooks to prevent/modify flow.
+ *
+ * TODO: Implement slide menu: http://www.berriart.com/sidr/#usage
+ *
+ * TODO: Implement widgets ala http://closure-library.googlecode.com/svn/docs/class_goog_ui_Component.html
+ *
  */
+
+    /*****************************************
+    * TODO: MOVE THIS TO A INIT FILE, CLEAN UP
+    *
+    * HANDLEBARS CUSTOM HELPERS:
+    ****************************************/
+    Handlebars.registerHelper('parseMarkdownContent', function(content) {
+        var excerpt = marked.parse(content);
+        // limit, postfix, forceClosingTags
+        return helpers.htmlTruncate(excerpt, 200, '...',true );
+    });
 
     var defaultConfig = {
         hashFragment:'#!/',
@@ -152,7 +170,7 @@ define(['handlebars', 'jquery'],function(Handlebars, $){
         console.log('- Loading hash ', hash);
         var lastModuleId;
         var queryData = {};
-        var i, t, route;
+        var i, t, route, routeId;
         hash = hash.replace('#!/','');
 
         //query string
@@ -179,7 +197,7 @@ define(['handlebars', 'jquery'],function(Handlebars, $){
         
         //TODO: This seems inefficient, we first unrender all
         //and then render the active stuff...DOES IT MAKE SENSE?!
-        for(var routeId in this.routes){
+        for(routeId in this.routes){
             if(!this.routes.hasOwnProperty(routeId)) continue;
             for(i = 0, t = this.routes[routeId].length; i < t; i++){
                 route = this.routes[routeId][i];
@@ -187,7 +205,7 @@ define(['handlebars', 'jquery'],function(Handlebars, $){
             }
         }
 
-        for(var routeId in this.routes){
+        for(routeId in this.routes){
             if(!this.routes.hasOwnProperty(routeId)) continue;
             for(i = 0, t = this.routes[routeId].length; i < t; i++){
                 route = this.routes[routeId][i];
@@ -268,6 +286,10 @@ define(['handlebars', 'jquery'],function(Handlebars, $){
                                 // console.log('Loaded all dependencies for ', scope.mid);
                                 scope.loaded = true;
                                 self.processed[module] = true;
+                                if('processed' in scope &&
+                                typeof scope.processed === 'function')
+                                    scope.processed();
+
                                 scope[route_fn](queryData);
                             });
                         }
@@ -299,6 +321,10 @@ define(['handlebars', 'jquery'],function(Handlebars, $){
         } else {
             // console.log('we are in dependencies')
             self.loadDependencies(scope, function(){
+                if('processed' in scope 
+                    && typeof scope.processed === 'function')
+                    scope.processed();
+
                 scope[route_fn](queryData);
             });
         }

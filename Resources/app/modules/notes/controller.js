@@ -21,7 +21,8 @@ define(['jquery'], function($){
     NotesController.prototype.dependencies = {
         'Sync': 'utils/sync',
         'Binder': 'utils/binder',
-        'jsyaml': 'libs/js-yaml',
+        // 'helpers':'utils/helpers',
+        // 'jsyaml': 'libs/js-yaml',
         'date.format': 'libs/date.format',
         'epiceditor': 'libs/epiceditor/js/epiceditor',
         'bootstrap-datepicker': 'libs/bootstrap/bootstrap.datepicker',
@@ -48,26 +49,59 @@ define(['jquery'], function($){
         console.log('NotesController render ', data, templateId);
        
         App.render(this, data, templateId);
-        console.log('---------------');
     };
+
+    /**
+     * Module method that will be fired after dependencies
+     * and templates are loaded and before we are rendering
+     * the inial route.
+     * On subsecuent routes this will not be called.
+     *
+     */
+    NotesController.prototype.processed = function(){
+        //scope, mappings, post
+        var mapping = [
+            {
+                key:'dropbox',
+                setter:$.proxy( this.Sync.setService, this.Sync )
+            },
+            {
+                key:'yamlParser',
+                setter:$.proxy( this.Sync.setParser, this.Sync )
+            }
+        ];
+
+        var onMapped = function(){console.log('We are mapped!!')};
+
+        App.injector.solveMappings(this, mapping, onMapped);
+    };
+
 
 /////////////////////////////////////////////////////////
 //  ROUTES HANDLERS
 /////////////////////////////////////////////////////////
     NotesController.prototype.routeList = function(data){
-        console.log('>>> list notes');
-        // var notes = this.Sync.getAllNotes();
-        // console.log('------- ', notes);
-        
-        
+        console.log('>>> list notes ', this.helpers);
+        // var notes = this.Sync.getAllNotes(this.doRouteLis);
+        var callback = $.proxy(this.doRouteList, this);
+        console.log('callback ',callback);
+        var notes = this.Sync.getAllNotes(callback);
+
+
+    };
+
+    NotesController.prototype.doRouteList = function(notes){
+        console.log('============================');
+        /*
         var note = new this.Note();
         note.title = 'test';
         note.content = 'hola, how are you doing';
-        console.log('This is a note ', note);
+        console.log('This is a note ', note);*/
         
+        console.log(notes);
         //TODO: Rename directory notes to note, so that
         //it matches url pattern.
-        this.render(this.notes, 'notes/list');
+        this.render(notes, 'notes/list');
 
         //TODO:Move pagination stuff here. Use pagination as
         //widget, we listen to events from here. Pagination
@@ -88,7 +122,6 @@ define(['jquery'], function($){
             action = action.charAt(0).toUpperCase() + action.slice(1);
             console.log(action, ' for ', id);
             self['action'+action](id);
-
         });
         
         $('.pagination').on('click', 'a', function(e){
@@ -106,6 +139,7 @@ define(['jquery'], function($){
         var id = App.resolvePropertyChain(data, '__data.id');
         console.log('ID OF POST ', id);
         return;
+
         if(!id) return App.navigate('note/list');
 
         var note = this.notes[data.__data.id];

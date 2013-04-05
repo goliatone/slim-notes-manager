@@ -14,20 +14,27 @@ require.config({
         },
         'dropbox':{
             exports:'Dropbox'
+        },
+        'jsyaml':{
+            exports:'jsyaml'
         }
+
     },
     // Libraries
     paths: {
         'bootstrap': 'libs/bootstrap/bootstrap',
         // 'bootstrap-datepicker': '../javascripts/vendors/bootstrap/bootstrap.datepicker',
+        'jsyaml': 'libs/yaml',
         'jquery':'libs/jquery',
-        'jsyaml': 'libs/js-yaml',
+        'marked':'libs/marked',
         'dateformat': 'libs/date.format',
         'epiceditor': 'libs/epiceditor/js/epiceditor',
         'handlebars': 'libs/handlebars',
         'dropbox': 'libs/dropbox.min',
-        'widgets':'widgets'
+        'queue':'utils/queue',
+        'helpers':'utils/helpers',
+        'injector':'utils/injector'
     }
 });
 
-require(['main','jquery', 'bootstrap', 'handlebars'/*, 'dropbox'*/]);
+require(['main','jquery', 'bootstrap', 'handlebars', 'marked']);

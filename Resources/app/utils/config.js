@@ -11,8 +11,8 @@ define(['jquery'], function($){
     Config.prototype.metadata = function(namespace){
         var self = this;
         namespace = namespace || (namespace = Config.DEFAULT_META_NAMESPACE);
-        $('meta[name^=\'app-\']').forEach(function(el){
-            self.addMeta(el.name.replace('app-',''), el.content, namespace);
+        $('meta[name^=\''+ namespace +'-\']').forEach(function(el){
+            self.addMeta(el.name.replace( namespace +'-',''), el.content, namespace);
         });
     };
 
@@ -22,5 +22,5 @@ define(['jquery'], function($){
     };
 
     return Config;
-    
+
 });

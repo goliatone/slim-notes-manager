@@ -494,7 +494,7 @@ var YAML =
          * @param {String} str String with the YAML file contents.
          * @function
          */
-        eval : eval,
+        load : eval,
         
         /**
          * Get errors found when parsing the last file.

@@ -7,16 +7,21 @@
 <div class="row-fluid">
     <div id="notes-holder" class="span">
         {{#notes}}
-		<div id="note-{{id}}" class="note-holder row-fluid Widget" data-widget="note">
+		<div id="note-{{slug}}" class="note-holder row-fluid Widget" data-widget="note">
 		    <div class="span note-entry">
-		        <div class="btn-group actions" data-parent-id="{{id}}">
+		        <div class="btn-group actions" data-parent-id="{{slug}}">
 		            <button type="button" class="btn action-toolbar-btn" data-action="preview"><i class="icon-eye-open"></i></button>
 		            <button type="button" class="btn action-toolbar-btn" data-action="edit"><i class="icon-edit"></i></button>
 		            <button type="button" class="btn action-toolbar-btn" data-action="delete"><i class="icon-trash"></i></button>
 		        </div>
 		        <h3>{{title}}</h3>
 		        <div>{{date}}</div>
-		        <p>{{content}}</p>
+                {{#if excerpt}}
+                    {{{excerpt}}}
+                {{else}}
+                    {{{parseMarkdownContent content}}}
+                {{/if}}      
+		        
 		    </div>
 		</div>
 		{{/notes}}
