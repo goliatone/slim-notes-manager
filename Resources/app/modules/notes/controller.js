@@ -300,6 +300,11 @@ define(['jquery'], function($){
      * Generic trigger handler, we implement Command pattern,
      * but since this is javascript, dont tell.
      *
+     * TODO: DO WE WANT TO MOVE THIS UP ONE? AND DO IT AS A
+     *       PREPROCESSOR ACTION? SHOULD WE LIST ON EACH
+     *       MODULE THE PREPROCESSORS WE NEED, SO THAT WE
+     *       CAN SKIP IN CASE THOSE ARE NOT NEEDED?
+     *
      * @param  {Object} e Event
      */
     NotesController.prototype.handleTriggers = function(e){
