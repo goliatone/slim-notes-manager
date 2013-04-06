@@ -1,3 +1,3 @@
-# HelloWorld Sample App
+#SimpleNotes Manager
 
-Simplest possible TideSDK desktop app demonstrating menus and hello world.
+TideSDK desktop app to manage SimpleNotes. TBD.

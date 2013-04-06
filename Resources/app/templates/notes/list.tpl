@@ -1,9 +1,19 @@
 <div class="row-fluid section-heading">
     <h2>Notes</h2>
-    <a href="#!/note/create" class="btn btn-success right" type="button">
-        <i class="icon-plus icon-white"></i>    Create Note
-    </a>    
+    <div class='note-actions-menu btn-toolbar right'>
+        <a href="#!/note/refresh"
+           data-trigger-action="note.refresh"
+           data-trigger-params='{"id":12, "command":"fuck","msg":"this is it"}'
+           class="btn btn-info trigger"
+           type="button">
+            <i class="icon-refresh icon-white"></i>
+        </a> 
+        <a href="#!/note/create" class="btn btn-success" type="button" data-action="note/create">
+            <i class="icon-plus icon-white"></i>    Create Note
+        </a>
+    </div>
 </div>
+
 <div class="row-fluid">
     <div id="notes-holder" class="span">
         {{#notes}}
@@ -14,13 +24,13 @@
 		            <button type="button" class="btn action-toolbar-btn" data-action="edit"><i class="icon-edit"></i></button>
 		            <button type="button" class="btn action-toolbar-btn" data-action="delete"><i class="icon-trash"></i></button>
 		        </div>
-		        <h3>{{title}}</h3>
-		        <div>{{date}}</div>
-                {{#if excerpt}}
+		        <div>{{dateFormat date}}</div>
+                <h3><a href="#{{slug}}" data-action="edit">{{title}}</a></h3>
+                <!--{{#if excerpt}}
                     {{{excerpt}}}
                 {{else}}
                     {{{parseMarkdownContent content}}}
-                {{/if}}      
+                {{/if}}-->      
 		        
 		    </div>
 		</div>

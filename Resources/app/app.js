@@ -24,6 +24,7 @@ define(['handlebars', 'jquery', 'helpers'],function(Handlebars, $, helpers){
  *
  * TODO: Implement widgets ala http://closure-library.googlecode.com/svn/docs/class_goog_ui_Component.html
  *
+ * NOTE: FEATURE: Add inline comment/annotation feature.
  */
 
     /*****************************************
@@ -31,10 +32,15 @@ define(['handlebars', 'jquery', 'helpers'],function(Handlebars, $, helpers){
     *
     * HANDLEBARS CUSTOM HELPERS:
     ****************************************/
+    Handlebars.registerHelper('dateFormat', function(date) {
+        if(typeof date === 'string') date = new Date(date);
+        return date.format('yyyy-mm-dd');
+    });
+
     Handlebars.registerHelper('parseMarkdownContent', function(content) {
         var excerpt = marked.parse(content);
         // limit, postfix, forceClosingTags
-        return helpers.htmlTruncate(excerpt, 200, '...',true );
+        return helpers.htmlTruncate(excerpt, 150, '...',true );
     });
 
     var defaultConfig = {

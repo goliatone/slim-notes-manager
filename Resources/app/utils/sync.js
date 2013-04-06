@@ -29,7 +29,6 @@ define([/*'jsyaml',*/ 'queue'], function(jsyaml, Queue){
     };
 
     Sync.prototype.setParser = function(parser){
-        console.log('====> PARSING STUFF ');
         this.parser = parser;
     };
 
@@ -82,7 +81,8 @@ define([/*'jsyaml',*/ 'queue'], function(jsyaml, Queue){
                 return console.log(error);
             }
 
-
+            console.log('WE HAVE RAGAMUFFIN DATA ', data);
+            
             var lines = data.split(Sync.NOTE_DELIMETER);
             var meta  = lines.shift();
 

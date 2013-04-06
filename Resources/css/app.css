@@ -7,14 +7,14 @@
 :: Page Name 1
 :: Page Name 2
 */
-.row.full{
+.row.full {
 	width:100%;
 }
 body, html {
 	background-color: #fafafa;
 	height:100%;
 }
-.container-fluid{
+.container-fluid {
 	margin-top: 20px;
 }
 
@@ -26,13 +26,13 @@ body, html {
 ----------------------------------------- */
 
 .content,
-.page{
+.page {
 	height:100%;
 }
-.page{
+.page {
 	visibility: hidden;
 }
-.page.active{
+.page.active {
 	visibility:visible;
 	/*background-color:#ff3366;*/
 }
@@ -226,6 +226,12 @@ body, html {
 	top:14px;
 }
 
+/* --------------------------------------------------
+ *  Notes action menu
+ *-------------------------------------------------*/
+.note-actions-menu ul {
+	
+}
 
 /* --------------------------------------------------
  *  Tags

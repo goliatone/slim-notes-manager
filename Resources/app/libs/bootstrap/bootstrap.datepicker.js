@@ -390,6 +390,9 @@
 			return {separator: separator, parts: parts};
 		},
 		parseDate: function(date, format) {
+			//BUG FIX: If date is a Date object, then we need
+			//to stringify.
+			date = date + "";
 			var parts = date.split(format.separator),
 				date = new Date(),
 				val;

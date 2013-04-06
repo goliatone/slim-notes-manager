@@ -62,7 +62,6 @@ define(function(){
 
         if(post && typeof post === 'function')
             post.call(scope, postArgs);
-        else console.log('NAAAW, FUCK YOU!');
     };
 
     /**

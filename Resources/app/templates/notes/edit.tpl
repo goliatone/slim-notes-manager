@@ -26,7 +26,7 @@
             </div><!--/span-->
             
             <div class="span4 well">
-                <input type="text" placeholder="Date" name="date" class="input span datepicker" data-date-format="dd-mm-yyyy"/>
+                <input type="text" placeholder="Date" name="date" class="input span datepicker" data-date-format="dd-mm-yyyy" data-provide="datepicker"/>
                 <!-- <div class="row-fluid input-append datepicker" id="dp3" data-date="12-02-2012" data-date-format="dd-mm-yyyy">
                   <input class="span11" size="16" type="text" value="12-02-2012">
                   <span class="add-on"><i class="icon-th"></i></span>

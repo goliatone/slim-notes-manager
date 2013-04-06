@@ -11,6 +11,7 @@ define(['jquery'], function($){
     };
 
     NotesController.prototype.events = {
+        'click .trigger' : 'handleTriggers',
         'click #create-note-save' : 'handleCreateButton',
         'click #create-note-cancel' :'handleCancelButton',
         'click #create-note-add-parameter': 'handleAddParameterButton'
@@ -86,8 +87,6 @@ define(['jquery'], function($){
         var callback = $.proxy(this.doRouteList, this);
         console.log('callback ',callback);
         var notes = this.Sync.getAllNotes(callback);
-
-
     };
 
     NotesController.prototype.doRouteList = function(notes){
@@ -137,30 +136,23 @@ define(['jquery'], function($){
 
 
         var id = App.resolvePropertyChain(data, '__data.id');
-        console.log('ID OF POST ', id);
-        return;
-
+       
         if(!id) return App.navigate('note/list');
+        console.log('edit note ', id);
 
-        var note = this.notes[data.__data.id];
+        var note = this.Sync.notesIds[id];
+        
         if(!note) App.navigate('note/list');
+
+        //TODO: Make note a Note model. Move this to model.
+        if(typeof note.date === 'string') note.date = new Date(note.date);
+
         var self = this;
-        var $textarea = $('textarea[name=content]');
-        $textarea.hide();
-        var opts =
-        {
-            container: 'epiceditor',
-            basePath:'app/libs/epiceditor',
-            textarea:$textarea,
-            focusOnLoad: true
-        };
+        
         // console.log('textarea ', $('textarea[name=content]'));
         // console.log('epiceditor ', $('body').html());
-        self.editor = new EpicEditor(opts);//.load();
-        
-        self.editor.load();
 
-        $('.datepicker').datepicker();
+        $('.datepicker').datepicker({autoclose:true});
         
         
         $('input[name=title]').change(function(){
@@ -185,6 +177,47 @@ define(['jquery'], function($){
             };
 
             $('input[name=slug]').val(slug(title)).focus();
+        });
+
+        //TODO: Bind model to form.
+        $('input[name=title]').val(note.title);
+        $('input[name=slug]').val(note.slug);
+
+        //BUG FIX: BOOTSTRAP.DATEPICKER craps out if we pass a Date
+        //expects string. hack=> date + ""
+        if(note.date){
+            console.log('We have date ', note.date);
+            $('input[name=date]').val(note.date.format('yyyy-mm-dd') + '');
+        } else {
+            console.log('We dont have a fucking date!');
+            $('input[name=date]').val( new Date().format('yyyy-mm-dd') + '');
+        }
+
+        $('input[name=tags]').val(note.tags);//.split(',');
+
+        var $textarea = $('textarea[name=content]');
+        $textarea.hide();
+        var opts =
+        {
+            container: 'epiceditor',
+            basePath:'app/libs/epiceditor',
+            textarea:$textarea,
+            focusOnLoad: true,
+            file: {
+                name: note.title,
+                defaultContent: note.content,
+                autoSave: 100
+            }
+        };
+
+        self.editor = new EpicEditor(opts);
+        self.editor.load();
+
+        self.editor.importFile(note.title, note.content);
+        self.editor.reflow();
+
+        $(window).on('resize',function(){
+            self.editor.reflow();
         });
     };
 
@@ -262,9 +295,25 @@ define(['jquery'], function($){
         var target = e.target;
         console.log(target);
     };
+
+    /**
+     * Generic trigger handler, we implement Command pattern,
+     * but since this is javascript, dont tell.
+     *
+     * @param  {Object} e Event
+     */
+    NotesController.prototype.handleTriggers = function(e){
+        var action = $(e.target).data('trigger-action');
+        var params = $(e.target).data('trigger-params');
+        console.log('We are triggering action ', action, ' with params ', params);
+        console.log('Hei, you: ',params.msg,' # ',params.id);
+        // App.trigger(action);
+    };
+
 /////////////////////////////////////////////////////////
 //  ACTION HANDLERS
 /////////////////////////////////////////////////////////
+
     NotesController.prototype.actionPreview = function(id){
         console.log('Preview ', id);
     };
