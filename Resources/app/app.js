@@ -251,8 +251,6 @@ define(['handlebars', 'jquery', 'helpers'],function(Handlebars, $, helpers){
         var self  = this;
         var scope = this.scope[module];
 
-        
-
         //we are assuming that each controller has a template. wrong?
         //we should declare our templates in the module.
         //one module/controller can have more than one template,
@@ -276,7 +274,7 @@ define(['handlebars', 'jquery', 'helpers'],function(Handlebars, $, helpers){
             var total   = this.objectLength(templates);
             $.each(templates, function(templateId, templateValue) {
                 // console.log('****** Loading stuff for ', templateId);
-                
+
                 self.loader({
                     url:self.templateUrl(templateId),
                     type:'GET',
@@ -432,6 +430,9 @@ define(['handlebars', 'jquery', 'helpers'],function(Handlebars, $, helpers){
         var rendered = renderer(data);
 
         el.innerHTML = rendered;
+        //TODO: We need a post process hook. So we can 
+        //for instance start our widgets.
+
         el.style.display = 'block';
 
         //TODO: Figure out why this does not work?!
